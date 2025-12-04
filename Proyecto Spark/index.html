@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark Media | Estrategia 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800;900&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandRed: '#EF4444', /* Rojo vibrante para modo oscuro */
+                        brandDarkRed: '#B91C1C',
+                        brandBlack: '#0a0a0a', 
+                        brandDark: '#171717',
+                        brandLight: '#F3F4F6',
+                    },
+                    fontFamily: {
+                        sans: ['Open Sans', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 25px rgba(239, 68, 68, 0.5)',
+                        'card': '0 20px 40px -5px rgba(0, 0, 0, 0.6)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Estilos base DARK MODE */
+        body {
+            background-color: #050505;
+            color: #fff;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* Contenedor principal */
+        .slides-container {
+            height: 100vh;
+            width: 100%;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            position: relative;
+        }
+
+        /* CONFIGURACIÓN DE FOTOS REESCALADAS 1920x1080 */
+        section {
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem 5%; 
+            overflow: hidden;
+            background-color: #000;
+            /* Asegura que la imagen cubra toda la pantalla (1920x1080) centradamente */
+            background-position: center center;
+            background-size: cover; 
+            background-repeat: no-repeat;
+        }
+
+        /* SLIDE ESPECIAL: MISIÓN Y VISIÓN (Full Screen) */
+        section#slide-4 {
+            padding: 0 !important; 
+            display: block; 
+        }
+
+        /* CAPAS DE OSCURIDAD (Overlays) */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            /* 75% negro + blur: Se ve la foto, pero se lee el texto */
+            background: rgba(0, 0, 0, 0.75); 
+            backdrop-filter: blur(3px); 
+            z-index: 1;
+        }
+        
+        .overlay-dark {
+            position: absolute;
+            inset: 0;
+            /* 85% negro para slides con mucho texto */
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 1;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Video de Fondo - Optimizado para Full Screen */
+        .video-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Clave para reescalado correcto */
+            z-index: 0;
+        }
+
+        /* Barra de navegación */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+            background: rgba(0, 0, 0, 0.85);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Botones de Navegación */
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: rgba(20, 20, 20, 0.8);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 60;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-btn:hover {
+            background-color: #EF4444;
+            border-color: #EF4444;
+            transform: scale(1.1);
+        }
+
+        #prevBtn { left: 20px; }
+        #nextBtn { right: 20px; }
+
+        /* Puntos indicadores ABAJO */
+        .progress-bar {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 55;
+            padding: 8px 20px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: #4B5563;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #EF4444;
+            width: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #EF4444;
+        }
+
+        /* Tipografía y Estilos de Texto */
+        .slide-title {
+            font-size: 2.8rem;
+            margin-bottom: 2rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        
+        /* Tarjetas Glassmorphism Mejoradas */
+        .glass-card {
+            background: rgba(30, 30, 30, 0.4); 
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 2rem; 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            background: rgba(40, 40, 40, 0.6);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        /* Listas y textos detallados */
+        .detail-list li {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #d1d5db;
+            display: flex;
+            align-items: start;
+        }
+        .detail-list li i {
+            margin-top: 4px;
+            margin-right: 10px;
+            color: #EF4444;
+        }
+
+        .slides-container::-webkit-scrollbar { width: 0px; }
+        .animate-up { animation: slideUp 0.8s ease-out forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-brandRed rounded flex items-center justify-center text-white font-bold shadow-glow">S</div>
+            <div class="text-xl font-black text-white tracking-widest">SPARK <span class="text-brandRed">MEDIA</span></div>
+        </div>
+        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest hidden md:block">Estrategia Integral 2026</span>
+    </nav>
+
+    <button id="prevBtn" class="nav-btn"><i class="fas fa-chevron-left"></i></button>
+    <button id="nextBtn" class="nav-btn"><i class="fas fa-chevron-right"></i></button>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="slides-container" id="container">
+
+        <!-- SLIDE 1: PORTADA CON VIDEO DE FONDO -->
+        <section id="slide-1">
+            <!-- VIDEO DE FONDO -->
+            <video class="video-bg" autoplay muted loop playsinline>
+                <source src="Generación_de_Video_Cinematográfico_Animado.mp4" type="video/mp4">
+                <!-- Fallback a imagen si el video no carga -->
+                <img src="IMG_2101.jpg" alt="Fondo" class="w-full h-full object-cover">
+            </video>
+
+            <div class="overlay"></div>
+            
+            <div class="content-layer text-center max-w-6xl mx-auto animate-up">
+                
+                <div class="inline-flex items-center bg-black/60 border border-brandRed/50 shadow-glow px-6 py-2 rounded-full mb-8 backdrop-blur-md">
+                    <i class="fas fa-bolt text-brandRed mr-3 animate-pulse"></i>
+                    <p class="text-sm font-bold text-gray-200 uppercase tracking-wider">
+                        Proyecto de Crecimiento Pyme
+                    </p>
+                </div>
+
+                <p class="text-xl md:text-2xl text-gray-300 font-medium mb-4">
+                    ¿Sabías que el <span class="text-brandRed font-bold border-b border-brandRed">75% de los clientes</span> juzga la credibilidad de tu negocio por su imagen digital?
+                </p>
+
+                <h1 class="text-7xl md:text-[9rem] font-black mb-4 leading-none text-white tracking-tighter drop-shadow-2xl">
+                    SPARK <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brandRed to-red-600">MEDIA</span>
+                </h1>
+                
+                <div class="relative inline-block mb-12">
+                    <p class="text-3xl md:text-5xl text-white font-bold italic relative z-10 drop-shadow-lg">
+                        "Tu negocio merece verse <span class="text-brandRed underline decoration-4 decoration-red-600 underline-offset-8">gigante</span>."
+                    </p>
+                </div>
+                
+                <div class="flex justify-center gap-16 pt-8 border-t border-gray-700 max-w-xl mx-auto">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 font-bold uppercase mb-1">Estrategia</p>
+                        <p class="text-lg font-bold text-white">Juan Carlos Glez.</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 font-bold uppercase mb-1">Lanzamiento</p>
+                        <p class="text-lg font-bold text-white">Enero 2026</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: CONTEXTO -->
+        <section id="slide-2" style="background-image: url('IMG_2061.jpg');">
+            <div class="overlay"></div>
+            <div class="max-w-7xl mx-auto w-full content-layer">
+                <h2 class="slide-title">El Problema de Mercado</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-8">
+                        <p class="text-xl text-gray-300 leading-relaxed font-medium">
+                            Las Pymes en Puebla (Sector C+/C) enfrentan una <span class="text-brandRed font-bold">"Brecha de Profesionalismo"</span>. Necesitan vender en redes, pero están atrapadas en un dilema de inversión:
+                        </p>
+                        
+                        <!-- Tarjetas de Dolor -->
+                        <div class="glass-card flex-row items-center !p-6 border-l-4 border-l-red-500">
+                            <i class="fas fa-dollar-sign text-3xl text-brandRed mr-6"></i>
+                            <div>
+                                <h4 class="font-bold text-lg text-white mb-1">La Barrera del Costo</h4>
+                                <p class="text-gray-400 text-sm">Agencias como <em>Seonet</em> cobran tarifas corporativas (+$20k/mes) que una Pyme local no puede sostener a largo plazo.</p>
+                            </div>
+                        </div>
+
+                        <div class="glass-card flex-row items-center !p-6 border-l-4 border-l-gray-500">
+                            <i class="fas fa-video-slash text-3xl text-gray-400 mr-6"></i>
+                            <div>
+                                <h4 class="font-bold text-lg text-white mb-1">La Trampa de lo "Barato"</h4>
+                                <p class="text-gray-400 text-sm">Contratar freelancers informales o hacerlo "casero" daña la percepción de estatus y ahuyenta clientes de alto valor.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card text-center !border-brandRed !border-2 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-brandRed opacity-5 group-hover:opacity-10 transition"></div>
+                        <i class="fas fa-chart-line text-7xl text-brandRed mb-6 block drop-shadow-glow"></i>
+                        <h3 class="text-3xl font-black text-white mb-4">El Resultado</h3>
+                        <p class="text-xl text-gray-300 mb-6">
+                            Sin una imagen profesional, la Pyme no transmite confianza.<br>
+                            <strong class="text-white text-2xl mt-2 block">Baja Visibilidad = Pérdida de Ventas B2B.</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: IDENTIDAD -->
+        <section id="slide-3" style="background-image: url('IMG_1825.jpg');">
+            <div class="overlay"></div>
+            <div class="max-w-7xl mx-auto w-full content-layer">
+                <div class="text-center mb-12">
+                    <h2 class="slide-title mb-2">La Solución: Spark Media</h2>
+                    <p class="text-xl text-gray-400 max-w-3xl mx-auto">Casa productora B2B especializada en contenido de alto impacto para negocios locales.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="glass-card group">
+                        <div class="w-16 h-16 bg-brandRed rounded-xl flex items-center justify-center text-white mb-6 shadow-glow group-hover:rotate-6 transition">
+                            <i class="fas fa-film text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Propuesta de Valor</h3>
+                        <p class="text-body text-sm">
+                            <strong>"Calidad de Cine a Escala Pyme".</strong><br>
+                            Rompemos el estigma de que "lo barato sale caro". Ofrecemos iluminación, audio y guion profesional a precios accesibles para el mercado poblano.
+                        </p>
+                    </div>
+
+                    <div class="glass-card group">
+                        <div class="w-16 h-16 bg-gray-800 rounded-xl flex items-center justify-center text-white mb-6 border border-gray-600 group-hover:-rotate-6 transition">
+                            <i class="fas fa-bolt text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Tono "Profesional Fresco"</h3>
+                        <p class="text-body text-sm">
+                            Hablamos de tú a tú. Fusionamos la estética minimalista y las tendencias de <strong>TikTok/Reels</strong> con una estrategia de ventas rigurosa para generar leads.
+                        </p>
+                    </div>
+
+                    <div class="glass-card group">
+                        <div class="w-16 h-16 bg-white text-black rounded-xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition">
+                            <i class="fas fa-handshake text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Valores Core</h3>
+                        <ul class="detail-list">
+                            <li><i class="fas fa-check"></i> <strong>Puntualidad:</strong> Respeto absoluto al tiempo del cliente.</li>
+                            <li><i class="fas fa-check"></i> <strong>Calidad Técnica:</strong> No entregamos nada "amateur".</li>
+                            <li><i class="fas fa-check"></i> <strong>Creatividad:</strong> Ideas enfocadas en vender.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: MISION/VISION (FULL SCREEN) -->
+        <section id="slide-4" style="background-image: url('IMG_1773.jpg');">
+             <div class="overlay"></div>
+             <!-- Grid que cubre 100% de alto y ancho -->
+             <div class="grid grid-cols-1 md:grid-cols-2 h-full w-full relative z-20">
+                
+                <!-- Columna Misión (Rojo) -->
+                <div class="bg-brandRed/95 flex flex-col justify-center px-16 md:px-24 border-r border-white/10 group">
+                    <i class="fas fa-rocket text-[15rem] absolute -bottom-20 -left-20 text-black opacity-10 group-hover:scale-110 transition duration-1000"></i>
+                    <span class="text-red-200 font-bold tracking-[0.3em] text-xs mb-4 uppercase">Nuestro Propósito</span>
+                    <h2 class="text-5xl font-black text-white mb-8 border-b-8 border-white inline-block pb-4">Misión</h2>
+                    <p class="text-2xl leading-relaxed font-light text-white opacity-95">
+                        "Democratizar la producción audiovisual de alta gama para las Pymes, transformando sus productos en narrativas visuales que eleven su percepción de valor y generen confianza inmediata."
+                    </p>
+                </div>
+
+                <!-- Columna Visión (Negro/Oscuro) -->
+                <div class="bg-brandBlack/90 flex flex-col justify-center px-16 md:px-24 group">
+                    <i class="fas fa-mountain text-[15rem] absolute -top-20 -right-20 text-white opacity-5 group-hover:scale-110 transition duration-1000"></i>
+                    <span class="text-gray-500 font-bold tracking-[0.3em] text-xs mb-4 uppercase">Hacia Dónde Vamos</span>
+                    <h2 class="text-5xl font-black text-white mb-8 border-b-8 border-brandRed inline-block pb-4">Visión</h2>
+                    <p class="text-2xl leading-relaxed font-light text-gray-300">
+                        "Consolidarnos como la casa productora referente para el emprendimiento en la región, reconocida por fusionar creatividad juvenil con estrategia de ventas, ayudando a negocios locales a competir visualmente con grandes marcas."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: PESTEL EXPANDIDO -->
+        <section id="slide-5" style="background-image: url('IMG_0142.jpg');">
+            <div class="overlay-dark"></div>
+            <div class="max-w-screen-2xl mx-auto w-full content-layer">
+                <h2 class="slide-title">Análisis PESTEL (Puebla)</h2>
+                <p class="text-lg text-gray-400 mb-8 max-w-4xl">Factores externos clave que justifican nuestra entrada al mercado.</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                    <div class="glass-card !p-6 border-t-4 !border-t-brandRed">
+                        <strong class="block text-brandRed font-bold mb-2 tracking-wider text-lg"><i class="fas fa-landmark mr-2"></i> POLÍTICO</strong>
+                        <ul class="detail-list">
+                            <li>Estabilidad local favorable para la inversión.</li>
+                            <li>Programas de fomento a la digitalización Pyme (Oportunidad de alianzas).</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card !p-6 border-t-4 !border-t-brandRed">
+                        <strong class="block text-brandRed font-bold mb-2 tracking-wider text-lg"><i class="fas fa-chart-pie mr-2"></i> ECONÓMICO</strong>
+                        <ul class="detail-list">
+                            <li>Inflación presiona gastos; las Pymes buscan opciones "Cost-Effective".</li>
+                            <li>Crecimiento de la clase media aspiracional (Target C+).</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card !p-6 border-t-4 !border-t-brandRed">
+                        <strong class="block text-brandRed font-bold mb-2 tracking-wider text-lg"><i class="fas fa-users mr-2"></i> SOCIAL</strong>
+                        <ul class="detail-list">
+                            <li>Emprendedores jóvenes (Gen Z) priorizan la estética visual.</li>
+                            <li>Consumidor poblano valora la "calidad percibida" en redes.</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card !p-6 border-t-4 !border-t-brandRed">
+                        <strong class="block text-brandRed font-bold mb-2 tracking-wider text-lg"><i class="fas fa-microchip mr-2"></i> TECNOLÓGICO</strong>
+                        <ul class="detail-list">
+                            <li>Dominio absoluto de formatos verticales (Reels/TikTok).</li>
+                            <li>IA (Sora/ChatGPT) como herramienta interna de eficiencia.</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card !p-6 border-t-4 !border-t-brandRed">
+                        <strong class="block text-brandRed font-bold mb-2 tracking-wider text-lg"><i class="fas fa-leaf mr-2"></i> ECOLÓGICO</strong>
+                        <ul class="detail-list">
+                            <li>Preferencia por proveedores "Paperless" y digitales.</li>
+                            <li>Comunicación de valores sostenibles como diferenciador.</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card !p-6 border-t-4 !border-t-brandRed">
+                        <strong class="block text-brandRed font-bold mb-2 tracking-wider text-lg"><i class="fas fa-balance-scale mr-2"></i> LEGAL</strong>
+                        <ul class="detail-list">
+                            <li>Estricto control de Derechos de Autor (Música comercial).</li>
+                            <li>Necesidad de contratos claros para proteger al cliente.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: CAME EXPANDIDO -->
+        <section id="slide-6" style="background-image: url('IMG_0224.jpg');">
+            <div class="overlay-dark"></div>
+            <div class="max-w-7xl mx-auto w-full content-layer">
+                <h2 class="slide-title text-white">Estrategia CAME</h2>
+                <p class="text-lg text-gray-300 mb-10">Plan de acción para neutralizar riesgos y potenciar ventajas.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Corregir -->
+                    <div class="glass-card !bg-white/5 border-l-4 border-l-yellow-500">
+                        <h3 class="text-xl font-bold text-yellow-500 mb-4 flex items-center"><i class="fas fa-wrench mr-3"></i> Corregir Debilidades</h3>
+                        <ul class="detail-list">
+                            <li><strong>Falta de Reputación:</strong> Crear un "Portafolio Pro-Bono" inmediato con 3 marcas locales reconocidas para generar prueba social.</li>
+                            <li><strong>Percepción de "Inexperiencia":</strong> Equilibrar el tono juvenil con contratos formales y procesos estructurados.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Afrontar -->
+                    <div class="glass-card !bg-white/5 border-l-4 border-l-red-500">
+                        <h3 class="text-xl font-bold text-red-500 mb-4 flex items-center"><i class="fas fa-shield-alt mr-3"></i> Afrontar Amenazas</h3>
+                        <ul class="detail-list">
+                            <li><strong>IA Generativa:</strong> Posicionarnos como "Estrategas Humanos". La IA hace video, nosotros hacemos ventas.</li>
+                            <li><strong>Competencia Desleal:</strong> Campañas educativas sobre el riesgo de contratar amateurs (falta de garantías).</li>
+                        </ul>
+                    </div>
+
+                    <!-- Mantener -->
+                    <div class="glass-card !bg-white/5 border-l-4 border-l-blue-500">
+                        <h3 class="text-xl font-bold text-blue-500 mb-4 flex items-center"><i class="fas fa-gem mr-3"></i> Mantener Fortalezas</h3>
+                        <ul class="detail-list">
+                            <li><strong>Calidad Visual:</strong> Reinversión constante en equipo (cámaras/luces) para mantener el estándar "Cine".</li>
+                            <li><strong>Agilidad Pyme:</strong> Mantener el trato directo con el dueño, evitando la burocracia de agencia grande.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Explotar -->
+                    <div class="glass-card !bg-white/5 border-l-4 border-l-green-500">
+                        <h3 class="text-xl font-bold text-green-500 mb-4 flex items-center"><i class="fas fa-rocket mr-3"></i> Explotar Oportunidades</h3>
+                        <ul class="detail-list">
+                            <li><strong>Demanda de ROI:</strong> Crear contenido educativo sobre cómo medir el retorno de inversión del video.</li>
+                            <li><strong>Publicidad Digital:</strong> Usar Google Ads para captar a Pymes que ya buscan "productoras en Puebla".</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: MERCADO EN PUEBLA -->
+        <section id="slide-7" style="background-image: url('IMG_0048.jpg');">
+            <div class="overlay"></div>
+            <div class="max-w-7xl mx-auto w-full content-layer">
+                <h2 class="slide-title">El Mercado en Puebla</h2>
+                <p class="text-gray-300 mb-6">Mapa de posicionamiento competitivo.</p>
+                
+                <div class="relative glass-card !p-8 h-[65vh] flex flex-col justify-center bg-black/60 border border-gray-600">
+                    <!-- Ejes -->
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="w-[90%] h-[1px] bg-gray-500"></div>
+                        <div class="h-[90%] w-[1px] bg-gray-500 absolute"></div>
+                    </div>
+                    
+                    <!-- Etiquetas -->
+                    <span class="absolute top-4 left-1/2 -translate-x-1/2 text-xs font-bold text-black bg-white px-3 py-1 rounded">ALTA CALIDAD / ESTRATEGIA</span>
+                    <span class="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-500 bg-black px-2">BAJA CALIDAD</span>
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-500 -rotate-90 bg-black px-2">BAJO PRECIO</span>
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-500 rotate-90 bg-black px-2">ALTO PRECIO</span>
+
+                    <!-- Competidores -->
+                    <div class="absolute top-[15%] right-[15%] flex flex-col items-center group">
+                        <div class="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg border border-gray-600">SEONET</div>
+                        <span class="text-[10px] font-bold text-gray-400 mt-1 bg-black/50 px-2 rounded">Ticket Alto (+$20k)</span>
+                    </div>
+
+                    <div class="absolute top-[25%] right-[25%] flex flex-col items-center group">
+                        <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg">Conektica</div>
+                    </div>
+
+                    <div class="absolute bottom-[20%] left-[20%] flex flex-col items-center group">
+                        <div class="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center text-gray-300 text-[10px] font-bold shadow-lg">Freelance</div>
+                        <span class="text-[10px] font-bold text-gray-400 mt-1 bg-black/50 px-2 rounded">Riesgo / Informal</span>
+                    </div>
+
+                    <!-- SPARK MEDIA -->
+                    <div class="absolute top-[25%] left-[35%] flex flex-col items-center z-10 animate-bounce cursor-pointer group">
+                        <div class="w-28 h-28 bg-brandRed rounded-full border-4 border-white shadow-glow flex items-center justify-center text-white font-black text-center text-sm leading-tight transform group-hover:scale-110 transition">
+                            SPARK<br>MEDIA
+                        </div>
+                        <div class="bg-white text-black text-xs px-4 py-1 rounded-full mt-3 shadow-lg font-bold uppercase tracking-wider">
+                            Océano Azul
+                        </div>
+                        <div class="absolute left-32 top-0 bg-black/90 p-4 rounded-lg shadow-xl border border-red-500 text-left w-56 opacity-0 group-hover:opacity-100 transition duration-300 z-20">
+                            <p class="text-xs text-brandRed font-bold mb-1">NUESTRA VENTAJA:</p>
+                            <p class="text-xs text-gray-300 leading-tight">Calidad visual de agencia Top, con estructura de costos Pyme (Ticket promedio $4k-$8k).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: CLIENTES IDEALES EXPANDIDO -->
+        <section id="slide-8" style="background-image: url('IMG_1763.jpg');">
+            <div class="overlay"></div>
+            <div class="max-w-7xl mx-auto w-full content-layer">
+                <h2 class="slide-title">Nuestros Clientes Ideales (Buyer Personas)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mt-4">
+                    
+                    <!-- Rodrigo -->
+                    <div class="glass-card !p-0 overflow-hidden border-l-8 border-l-brandRed hover:bg-white/10 transition">
+                        <div class="bg-white/10 p-6 flex justify-between items-center border-b border-white/10">
+                            <div>
+                                <h3 class="text-3xl font-black text-white">Rodrigo</h3>
+                                <span class="text-sm font-bold text-brandRed uppercase tracking-widest">El Emprendedor Visionario</span>
+                            </div>
+                            <i class="fas fa-rocket text-5xl text-brandRed opacity-80"></i>
+                        </div>
+                        <div class="p-8 space-y-6">
+                            <p class="text-base text-gray-300 italic pl-4 border-l-2 border-brandRed">"Quiero que mi negocio se vea cool y venda rápido. Sé que necesito video, pero no tengo tiempo de editar."</p>
+                            <div class="grid grid-cols-2 gap-6 text-sm text-gray-300">
+                                <div><strong class="block text-white text-xs uppercase mb-1">Perfil</strong> 35 años, Dueño de Restaurante/Gym.</div>
+                                <div><strong class="block text-white text-xs uppercase mb-1">Motivación</strong> Estatus y Crecimiento Rápido.</div>
+                                <div><strong class="block text-white text-xs uppercase mb-1">Canales</strong> TikTok, Instagram Reels.</div>
+                                <div class="col-span-2 bg-brandRed/20 p-3 rounded text-sm text-white border border-brandRed/30">
+                                    <strong>Estrategia de Venta:</strong> Venderle viralidad, impacto visual y "verse gigante" ante su competencia.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Elena -->
+                    <div class="glass-card !p-0 overflow-hidden border-l-8 border-l-gray-500 hover:bg-white/10 transition">
+                        <div class="bg-white/10 p-6 flex justify-between items-center border-b border-white/10">
+                            <div>
+                                <h3 class="text-3xl font-black text-white">Elena</h3>
+                                <span class="text-sm font-bold text-gray-400 uppercase tracking-widest">La Gerente Cautelosa</span>
+                            </div>
+                            <i class="fas fa-shield-alt text-5xl text-gray-400 opacity-80"></i>
+                        </div>
+                        <div class="p-8 space-y-6">
+                            <p class="text-base text-gray-300 italic pl-4 border-l-2 border-gray-500">"Necesito seguridad de que mi inversión retornará. No quiero arriesgar mi reputación con algo informal."</p>
+                            <div class="grid grid-cols-2 gap-6 text-sm text-gray-300">
+                                <div><strong class="block text-white text-xs uppercase mb-1">Perfil</strong> 48 años, Servicios Profesionales.</div>
+                                <div><strong class="block text-white text-xs uppercase mb-1">Motivación</strong> Seguridad y ROI.</div>
+                                <div><strong class="block text-white text-xs uppercase mb-1">Canales</strong> Google Search, LinkedIn.</div>
+                                <div class="col-span-2 bg-gray-700/50 p-3 rounded text-sm text-white border border-gray-600">
+                                    <strong>Estrategia de Venta:</strong> Venderle profesionalismo, contratos claros, facturación y garantías.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: OBJETIVOS SMART DETALLADOS -->
+        <section id="slide-9" style="background-image: url('IMG_2154.jpg');">
+            <div class="overlay-dark"></div>
+            <div class="max-w-7xl mx-auto w-full text-center z-10 content-layer">
+                <h2 class="slide-title mb-4">Objetivos SMART (6 Meses)</h2>
+                <p class="text-gray-400 mb-12 text-lg">Metas específicas y medibles alineadas con el presupuesto semilla de $40,000 MXN.</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div class="glass-card items-center text-center hover:bg-brandRed transition group cursor-default">
+                        <i class="fas fa-filter text-2xl text-gray-500 mb-4 group-hover:text-white"></i>
+                        <div class="text-6xl font-black text-white mb-2">120</div>
+                        <p class="text-sm uppercase font-bold text-gray-300 group-hover:text-white">Leads Calificados</p>
+                        <div class="w-full h-px bg-white/20 my-3"></div>
+                        <p class="text-xs text-gray-400 mt-1 group-hover:text-white">Costo por Lead < $200</p>
+                    </div>
+                    <div class="glass-card items-center text-center hover:bg-brandRed transition group cursor-default">
+                        <i class="fas fa-user-check text-2xl text-gray-500 mb-4 group-hover:text-white"></i>
+                        <div class="text-6xl font-black text-white mb-2">10</div>
+                        <p class="text-sm uppercase font-bold text-gray-300 group-hover:text-white">Clientes Nuevos</p>
+                        <div class="w-full h-px bg-white/20 my-3"></div>
+                        <p class="text-xs text-gray-400 mt-1 group-hover:text-white">Contratos Recurrentes</p>
+                    </div>
+                    <div class="glass-card items-center text-center hover:bg-brandRed transition group cursor-default">
+                        <i class="fas fa-exchange-alt text-2xl text-gray-500 mb-4 group-hover:text-white"></i>
+                        <div class="text-6xl font-black text-white mb-2">8%</div>
+                        <p class="text-sm uppercase font-bold text-gray-300 group-hover:text-white">Tasa Conversión</p>
+                        <div class="w-full h-px bg-white/20 my-3"></div>
+                        <p class="text-xs text-gray-400 mt-1 group-hover:text-white">De Lead a Cierre</p>
+                    </div>
+                    <div class="glass-card items-center text-center hover:bg-green-600 transition group cursor-default border-green-500/30">
+                        <i class="fas fa-coins text-2xl text-green-500 mb-4 group-hover:text-white"></i>
+                        <div class="text-6xl font-black text-green-400 group-hover:text-white mb-2">2:1</div>
+                        <p class="text-sm uppercase font-bold text-gray-300 group-hover:text-white">ROI Mínimo</p>
+                        <div class="w-full h-px bg-white/20 my-3"></div>
+                        <p class="text-xs text-gray-400 mt-1 group-hover:text-white">Rentabilidad Positiva</p>
+                    </div>
+                </div>
+
+                <div class="mt-16 inline-block">
+                    <div class="flex items-center bg-white px-10 py-5 rounded-full shadow-glow">
+                        <div class="w-12 h-12 bg-brandRed rounded-full flex items-center justify-center text-white mr-5">
+                            <i class="fas fa-wallet text-xl"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Presupuesto Semilla</p>
+                            <p class="text-4xl font-black text-brandBlack">$40,000 MXN</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: ESTRATEGIA INTEGRAL EXPANDIDA -->
+        <section id="slide-10" style="background-image: url('IMG_1773.jpg');">
+            <div class="overlay"></div>
+            <div class="max-w-7xl mx-auto w-full z-10 content-layer">
+                <h2 class="slide-title">Estrategia Integral (Funnel)</h2>
+                <p class="text-lg text-gray-300 mb-10">Combinación táctica de alcance pagado y autoridad orgánica.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <!-- Orgánica -->
+                    <div class="glass-card border-t-8 !border-t-purple-600">
+                        <h3 class="text-3xl font-bold text-white mb-6 flex justify-between items-center">
+                            Contenido Orgánico <i class="fab fa-instagram text-purple-400 text-4xl"></i>
+                        </h3>
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <span class="bg-purple-900 text-purple-200 w-8 h-8 rounded flex items-center justify-center font-bold text-sm mr-4 mt-1 shadow">1</span>
+                                <div>
+                                    <strong class="text-lg text-white">Autoridad Técnica (MOFU)</strong>
+                                    <p class="text-sm text-gray-400">Tutoriales de luz, audio y edición ("Cine-Tips") para demostrar expertise y generar confianza.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-purple-900 text-purple-200 w-8 h-8 rounded flex items-center justify-center font-bold text-sm mr-4 mt-1 shadow">2</span>
+                                <div>
+                                    <strong class="text-lg text-white">Educación sobre ROI (BOFU)</strong>
+                                    <p class="text-sm text-gray-400">Contenido racional para Elena: "Cómo medir el éxito de un video" y justificar la inversión.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-purple-900 text-purple-200 w-8 h-8 rounded flex items-center justify-center font-bold text-sm mr-4 mt-1 shadow">3</span>
+                                <div>
+                                    <strong class="text-lg text-white">Comedia B2B (TOFU)</strong>
+                                    <p class="text-sm text-gray-400">Humor empático sobre la vida del emprendedor para atraer tráfico viral y a Rodrigo.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paid Media -->
+                    <div class="glass-card border-t-8 !border-t-green-600">
+                        <h3 class="text-3xl font-bold text-white mb-6 flex justify-between items-center">
+                            Paid Media ($40k) <i class="fas fa-bullseye text-green-400 text-4xl"></i>
+                        </h3>
+                        <div class="space-y-6">
+                            <div class="bg-white/5 p-6 rounded-xl border border-white/10 hover:border-green-500/50 transition">
+                                <div class="flex justify-between mb-2">
+                                    <strong class="text-lg text-white"><i class="fab fa-facebook mr-2"></i> Meta Ads (Push)</strong>
+                                    <span class="text-xs bg-green-900 text-green-200 px-3 py-1 rounded font-bold border border-green-700">$20,000</span>
+                                </div>
+                                <p class="text-sm text-gray-400"><strong>Objetivo:</strong> Intereses y Visual. Mostrar el portafolio de video a dueños de negocios (Rodrigo).</p>
+                            </div>
+                            <div class="bg-white/5 p-6 rounded-xl border border-white/10 hover:border-green-500/50 transition">
+                                <div class="flex justify-between mb-2">
+                                    <strong class="text-lg text-white"><i class="fab fa-google mr-2"></i> Google Ads (Pull)</strong>
+                                    <span class="text-xs bg-green-900 text-green-200 px-3 py-1 rounded font-bold border border-green-700">$20,000</span>
+                                </div>
+                                <p class="text-sm text-gray-400"><strong>Objetivo:</strong> Intención de Búsqueda ("Productora de video Puebla"). Captar a Elena en el momento de decisión.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: HOJA DE RUTA 2026 (DETALLADA) -->
+        <section id="slide-11" style="background-image: url('IMG_1763.jpg');">
+            <div class="overlay"></div>
+            <div class="max-w-7xl mx-auto w-full z-10 content-layer">
+                <h2 class="slide-title">Hoja de Ruta 2026</h2>
+                <p class="text-lg text-gray-300 mb-10">Cronograma de ejecución financiera y operativa.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Fase 1 -->
+                    <div class="glass-card border-t-4 !border-t-gray-400 relative">
+                        <div class="absolute -top-3 left-6 bg-gray-600 text-white px-4 py-1 rounded text-xs font-bold uppercase shadow tracking-wider">Mes 1</div>
+                        <h3 class="text-2xl font-bold text-white mt-4 mb-4">Preparación</h3>
+                        <ul class="text-sm text-gray-300 space-y-3 list-none">
+                            <li><i class="fas fa-check text-gray-500 mr-2"></i><strong>Configuración:</strong> Píxeles de seguimiento, Google Analytics y CRM básico.</li>
+                            <li><i class="fas fa-check text-gray-500 mr-2"></i><strong>Portafolio:</strong> Producción de 3 casos "Pro Bono" para tener prueba social real.</li>
+                            <li><i class="fas fa-check text-gray-500 mr-2"></i><strong>Web:</strong> Optimización de Landing Page enfocada en conversión de leads.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Fase 2 -->
+                    <div class="glass-card border-t-4 !border-t-brandRed relative transform scale-105 z-10 bg-white/10 shadow-glow">
+                        <div class="absolute -top-3 left-6 bg-brandRed text-white px-4 py-1 rounded text-xs font-bold uppercase shadow-glow tracking-wider">Meses 2-3</div>
+                        <h3 class="text-2xl font-bold text-white mt-4 mb-4">Lanzamiento</h3>
+                        <ul class="text-sm text-gray-300 space-y-3 list-none">
+                            <li><i class="fas fa-play text-brandRed mr-2"></i><strong>Gasto Fijo:</strong> Ejecución de $24,000 MXN en pauta publicitaria inicial.</li>
+                            <li><i class="fas fa-play text-brandRed mr-2"></i><strong>Campañas:</strong> Activación de Meta Ads (Visual) y Google Ads (Búsqueda).</li>
+                            <li><i class="fas fa-play text-brandRed mr-2"></i><strong>Objetivo:</strong> Generación agresiva de 120 Leads Calificados.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Fase 3 -->
+                    <div class="glass-card border-t-4 !border-t-blue-500 relative">
+                        <div class="absolute -top-3 left-6 bg-blue-600 text-white px-4 py-1 rounded text-xs font-bold uppercase shadow tracking-wider">Meses 4-6</div>
+                        <h3 class="text-2xl font-bold text-white mt-4 mb-4">Escalamiento</h3>
+                        <ul class="text-sm text-gray-300 space-y-3 list-none">
+                            <li><i class="fas fa-chart-line text-blue-500 mr-2"></i><strong>Análisis:</strong> Evaluación profunda de ROI y Tasa de Cierre.</li>
+                            <li><i class="fas fa-chart-line text-blue-500 mr-2"></i><strong>Reserva:</strong> Si conversión > 5%, se invierten los $10k restantes para escalar.</li>
+                            <li><i class="fas fa-chart-line text-blue-500 mr-2"></i><strong>Optimización:</strong> Refinamiento de guiones de venta y procesos.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 12: CONCLUSIÓN -->
+        <section id="slide-12" style="background-image: url('IMG_2217_1.jpg');">
+            <div class="overlay"></div>
+            <div class="content-layer text-center max-w-5xl mx-auto z-10">
+                <div class="w-32 h-32 rounded-full bg-green-500 flex items-center justify-center mx-auto mb-10 shadow-glow animate-bounce text-white border-4 border-white">
+                    <i class="fas fa-check text-6xl"></i>
+                </div>
+                
+                <h2 class="text-6xl md:text-8xl font-black mb-10 text-white">Conclusión</h2>
+                
+                <p class="text-3xl text-gray-300 leading-relaxed font-light mb-16">
+                    El mercado en Puebla está saturado pero mal atendido. Existe un hueco claro para <strong class="text-white font-black">Spark Media</strong>: un servicio <strong class="text-brandRed font-black">profesional, accesible y estratégico</strong>.
+                </p>
+                
+                <div class="inline-block px-16 py-8 rounded-full bg-white shadow-2xl transform hover:scale-105 transition duration-500 cursor-pointer">
+                    <p class="text-sm text-gray-500 uppercase tracking-[0.3em] mb-2 font-bold">Estado del Proyecto</p>
+                    <p class="text-4xl font-black text-black tracking-widest">LISTO PARA EJECUCIÓN</p>
+                </div>
+            </div>
+            <footer class="absolute bottom-6 w-full text-center text-xs font-bold text-gray-500 uppercase tracking-widest z-20">
+                Spark Media &copy; 2026. Todos los derechos reservados.
+            </footer>
+        </section>
+
+    </div>
+
+    <script>
+        const sections = document.querySelectorAll('section');
+        const progressBar = document.getElementById('progressBar');
+        const container = document.getElementById('container');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let currentIndex = 0;
+
+        // Generar Puntos
+        sections.forEach((section, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            dot.addEventListener('click', () => scrollToSlide(index));
+            progressBar.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.dot');
+
+        function scrollToSlide(index) {
+            if (index < 0) index = 0;
+            if (index >= sections.length) index = sections.length - 1;
+            sections[index].scrollIntoView({ behavior: 'smooth' });
+        }
+
+        prevBtn.addEventListener('click', () => scrollToSlide(currentIndex - 1));
+        nextBtn.addEventListener('click', () => scrollToSlide(currentIndex + 1));
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') scrollToSlide(currentIndex + 1);
+            else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') scrollToSlide(currentIndex - 1);
+        });
+
+        function updateUI() {
+            let current = 0;
+            sections.forEach((section, index) => {
+                const sectionTop = section.offsetTop;
+                if (container.scrollTop >= (sectionTop - section.clientHeight / 2)) {
+                    current = index;
+                }
+            });
+            currentIndex = current;
+            dots.forEach(d => d.classList.remove('active'));
+            if(dots[currentIndex]) dots[currentIndex].classList.add('active');
+            
+            prevBtn.style.opacity = currentIndex === 0 ? '0.3' : '1';
+            prevBtn.style.pointerEvents = currentIndex === 0 ? 'none' : 'auto';
+            nextBtn.style.opacity = currentIndex === sections.length - 1 ? '0.3' : '1';
+            nextBtn.style.pointerEvents = currentIndex === sections.length - 1 ? 'none' : 'auto';
+        }
+
+        container.addEventListener('scroll', updateUI);
+        updateUI();
+    </script>
+</body>
+</html>
